@@ -59,7 +59,7 @@ local function createButton(text, parent)
     btn.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
     btn.BorderSizePixel = 2
     btn.BorderColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Text = text
+    btn.Text = text  -- Corrected: Set the Text property for the button
     btn.Font = Enum.Font.GothamBold
     btn.TextSize = 20
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
