@@ -47,8 +47,8 @@ TitleLabel.Text = "Evelynn Scripts"
 TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TitleLabel.Font = Enum.Font.GothamBold
 TitleLabel.TextSize = 24
-TitleLabel.TextAlign = Enum.TextAlign.Center
-TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Center  -- Corrected property
+TitleLabel.TextYAlignment = Enum.TextYAlignment.Center  -- Corrected property
 TitleLabel.ZIndex = 11
 
 -- Utility: create button
