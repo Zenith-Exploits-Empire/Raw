@@ -1,6 +1,6 @@
 --[[ 
   Evelynn Scripts
-  A sleek, modern Executor GUI with buttons for visibility and loading scripts.
+  Simple Executor GUI with a working Load Script button.
 --]]
 
 -- Services
@@ -19,19 +19,19 @@ ScreenGui.Parent = game:GetService("CoreGui")
 local Frame = Instance.new("Frame")
 Frame.Name = "MainFrame"
 Frame.Parent = ScreenGui
-Frame.Size = UDim2.new(0, 400, 0, 200)
-Frame.Position = UDim2.new(0.5, -200, 0.5, -100)
+Frame.Size = UDim2.new(0, 400, 0, 300)  -- Ensure there's enough space for the button
+Frame.Position = UDim2.new(0.5, -200, 0.5, -150)  -- Center the GUI
 Frame.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
 Frame.BorderSizePixel = 5
 Frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
 Frame.Active = true
-Frame.Draggable = true
+Frame.Draggable = true  -- Allow dragging of the frame
 Frame.ZIndex = 10
 
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = Frame
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 15)
+UIListLayout.Padding = UDim.new(0, 10)  -- Adequate padding to prevent overlap
 
 local UICorner = Instance.new("UICorner")
 UICorner.Parent = Frame
@@ -51,50 +51,61 @@ TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
 TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
 TitleLabel.ZIndex = 11
 
--- Utility: create button
-local function createButton(text, parent, size, position)
-    local btn = Instance.new("TextButton")
-    btn.Parent = parent
-    btn.Size = size or UDim2.new(1, -40, 0, 50)
-    btn.Position = position or UDim2.new(0, 20, 0, 40)
-    btn.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
-    btn.BorderSizePixel = 2
-    btn.BorderColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Text = text
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 20
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    local UICorner = Instance.new("UICorner")
-    UICorner.Parent = btn
-    UICorner.CornerRadius = UDim.new(0, 12)
+-- Create the "Load Script" button
+local btnLoadScript = Instance.new("TextButton")
+btnLoadScript.Parent = Frame
+btnLoadScript.Size = UDim2.new(1, -40, 0, 50)  -- Make it wide enough
+btnLoadScript.Position = UDim2.new(0, 20, 0, 70)  -- Position inside the frame
+btnLoadScript.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+btnLoadScript.BorderSizePixel = 2
+btnLoadScript.BorderColor3 = Color3.fromRGB(255, 255, 255)
+btnLoadScript.Text = "Load Script"
+btnLoadScript.Font = Enum.Font.GothamBold
+btnLoadScript.TextSize = 20
+btnLoadScript.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-    return btn
-end
+local UICornerButton = Instance.new("UICorner")
+UICornerButton.Parent = btnLoadScript
+UICornerButton.CornerRadius = UDim.new(0, 12)
 
--- Show/Hide Button
-local btnShowHide = createButton("Show/Hide GUI", ScreenGui, UDim2.new(0, 150, 0, 50), UDim2.new(0, 20, 0, 200))
+-- Add a TextBox for user input
+local scriptInputBox = Instance.new("TextBox")
+scriptInputBox.Parent = Frame
+scriptInputBox.Size = UDim2.new(1, -40, 0, 30)  -- Make it wide enough
+scriptInputBox.Position = UDim2.new(0, 20, 0, 130)  -- Position inside the frame
+scriptInputBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+scriptInputBox.BorderSizePixel = 2
+scriptInputBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+scriptInputBox.Text = "Enter your script here"
+scriptInputBox.Font = Enum.Font.GothamBold
+scriptInputBox.TextSize = 14
+scriptInputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 
--- One Button: "Load Script"
-local btnLoadScript = createButton("Load Script", Frame)
-
--- Show/Hide Button functionality
-btnShowHide.MouseButton1Click:Connect(function()
-    Frame.Visible = not Frame.Visible
-end)
+local UICornerInput = Instance.new("UICorner")
+UICornerInput.Parent = scriptInputBox
+UICornerInput.CornerRadius = UDim.new(0, 12)
 
 -- Load Script Button functionality
 btnLoadScript.MouseButton1Click:Connect(function()
-    -- You can implement the script you want to load here
-    print("Script Loaded!")
-    -- Example: Execute a sample script
-    local scriptToLoad = "print('Evelynn Script Loaded!')"
-    loadstring(scriptToLoad)()
+    print("Loading script...")
+    local userScript = scriptInputBox.Text
+    if userScript and userScript ~= "" then
+        -- Use pcall to catch errors safely
+        local success, errorMessage = pcall(function()
+            loadstring(userScript)()
+        end)
+        if not success then
+            print("Error loading script:", errorMessage)
+        end
+    else
+        print("No script entered.")
+    end
 end)
 
 -- Automatically show GUI on start
 Frame.Visible = true
 
--- Toggle GUI visibility (for desktop users, via Left Control)
+-- Toggle GUI visibility via Left Control Key (for desktop users)
 UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
     if input.KeyCode == toggleKey then
