@@ -1,6 +1,6 @@
 --[[ 
   Evelynn Scripts
-  Executor GUI with toggle (LeftControl), draggable frame, and multiple feature buttons.
+  A sleek, modern Executor GUI with multiple features, draggable frame, smooth animations, and custom styles.
 --]]
 
 -- Services
@@ -19,29 +19,58 @@ ScreenGui.Parent = game:GetService("CoreGui")
 local Frame = Instance.new("Frame")
 Frame.Name = "MainFrame"
 Frame.Parent = ScreenGui
-Frame.Size = UDim2.new(0, 350, 0, 250)
-Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
-Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-Frame.BorderSizePixel = 0
+Frame.Size = UDim2.new(0, 400, 0, 300)
+Frame.Position = UDim2.new(0.5, -200, 0.5, -150)
+Frame.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+Frame.BorderSizePixel = 5
+Frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
 Frame.Active = true
 Frame.Draggable = true
+Frame.ZIndex = 10
 
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = Frame
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 10)
+UIListLayout.Padding = UDim.new(0, 15)
+
+local UICorner = Instance.new("UICorner")
+UICorner.Parent = Frame
+UICorner.CornerRadius = UDim.new(0, 15)
+
+-- Title Label
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Parent = Frame
+TitleLabel.Size = UDim2.new(1, 0, 0, 40)
+TitleLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+TitleLabel.BorderSizePixel = 0
+TitleLabel.Text = "Evelynn Scripts"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextSize = 24
+TitleLabel.TextAlign = Enum.TextAlign.Center
+TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
+TitleLabel.ZIndex = 11
 
 -- Utility: create button
 local function createButton(text, parent)
     local btn = Instance.new("TextButton")
     btn.Parent = parent
-    btn.Size = UDim2.new(1, -20, 0, 40)
-    btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-    btn.BorderSizePixel = 0
+    btn.Size = UDim2.new(1, -40, 0, 50)
+    btn.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+    btn.BorderSizePixel = 2
+    btn.BorderColor3 = Color3.fromRGB(255, 255, 255)
     btn.Text = text
     btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 18
+    btn.TextSize = 20
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextButton.MouseButton1Click:Connect(function()
+        -- Smooth Animation
+        game:GetService("TweenService"):Create(btn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(56, 56, 56)}):Play()
+    end)
+    local UICorner = Instance.new("UICorner")
+    UICorner.Parent = btn
+    UICorner.CornerRadius = UDim.new(0, 12)
+
     return btn
 end
 
@@ -52,7 +81,8 @@ local btnPlayerTP = createButton("TP to Nearest Player", Frame)
 local btnOpenHub = createButton("Open Hub GUI", Frame)
 local btnDestroy = createButton("Destroy GUI", Frame)
 
--- Feature implementations
+-- Feature Implementations
+
 -- 1. Teleport to spawn point
 btnTeleport.MouseButton1Click:Connect(function()
     if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
