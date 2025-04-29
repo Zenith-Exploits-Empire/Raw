@@ -1,0 +1,121 @@
+--[[
+  Evelynn Scripts
+  Executor GUI with toggle (LeftControl), draggable frame, and multiple feature buttons.
+--]]
+
+-- Services
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+-- Settings
+local toggleKey = Enum.KeyCode.LeftControl
+local localPlayer = Players.LocalPlayer
+
+-- GUI Setup
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "EvelynnScriptsUI"
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Frame = Instance.new("Frame")
+Frame.Name = "MainFrame"
+Frame.Parent = ScreenGui
+Frame.Size = UDim2.new(0, 350, 0, 250)
+Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = Frame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 10)
+
+-- Utility: create button
+local function createButton(text, parent)
+    local btn = Instance.new("TextButton")
+    btn.Parent = parent
+    btn.Size = UDim2.new(1, -20, 0, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    btn.BorderSizePixel = 0
+    btn.Text = text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 18
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    return btn
+end
+
+-- Buttons
+local btnTeleport = createButton("Teleport to Spawn", Frame)
+local btnAutoCollect = createButton("Auto-Collect Items", Frame)
+local btnPlayerTP = createButton("TP to Nearest Player", Frame)
+local btnOpenHub = createButton("Open Hub GUI", Frame)
+local btnDestroy = createButton("Destroy GUI", Frame)
+
+-- Feature implementations
+-- 1. Teleport to spawn point
+btnTeleport.MouseButton1Click:Connect(function()
+    if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local spawnPos = workspace:FindFirstChild("SpawnLocation") and workspace.SpawnLocation.Position + Vector3.new(0, 5, 0) or Vector3.new(0, 5, 0)
+        localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(spawnPos)
+    end
+end)
+
+-- 2. Auto-collect: simple touch collectables tagged "Collectible"
+local autoCollecting = false
+btnAutoCollect.MouseButton1Click:Connect(function()
+    autoCollecting = not autoCollecting
+    btnAutoCollect.Text = autoCollecting and "Stop Auto-Collect" or "Auto-Collect Items"
+    spawn(function()
+        while autoCollecting do
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj:IsA("BasePart") and obj:FindFirstChild("Collectible") then
+                    if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        localPlayer.Character.HumanoidRootPart.CFrame = obj.CFrame
+                    end
+                end
+            end
+            wait(0.5)
+        end
+    end)
+end)
+
+-- 3. Teleport to nearest player
+btnPlayerTP.MouseButton1Click:Connect(function()
+    if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+    local closestDist, target = math.huge, nil
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= localPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local dist = (plr.Character.HumanoidRootPart.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude
+            if dist < closestDist then
+                closestDist = dist
+                target = plr
+            end
+        end
+    end
+    if target then
+        localPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0)
+    end
+end)
+
+-- 4. Open another GUI (placeholder for hub)
+btnOpenHub.MouseButton1Click:Connect(function()
+    warn("Hub GUI feature not implemented yet!")
+    -- You can load or toggle another ScreenGui here
+end)
+
+-- 5. Destroy the GUI
+btnDestroy.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Toggle GUI visibility
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.KeyCode == toggleKey then
+        Frame.Visible = not Frame.Visible
+    end
+end)
+
+-- Initialize: hide on start
+Frame.Visible = false
